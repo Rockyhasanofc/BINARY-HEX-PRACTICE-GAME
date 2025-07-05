@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Binary & Hex Practice Game</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #111;
+      color: #0f0;
+      text-align: center;
+      padding: 50px;
+    }
+    #question {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+    input {
+      font-size: 1.5rem;
+      padding: 10px;
+      width: 120px;
+      text-align: center;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      margin-top: 10px;
+      cursor: pointer;
+      background-color: #0f0;
+      color: #000;
+      border: none;
+      border-radius: 5px;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 1.2rem;
+    }
+    select {
+      font-size: 1rem;
+      margin-bottom: 20px;
+      padding: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎮 Binary & Hex Practice Game</h1>
+  <div>
+    <label for="mode">Select Mode:</label>
+    <select id="mode" onchange="generateQuestion()">
+      <option value="binary">Binary to Decimal</option>
+      <option value="hex">Hex to Decimal</option>
+    </select>
+  </div>
+  <div id="question">Loading...</div>
+  <input type="text" id="answer" placeholder="Your Answer">
+  <br>
+  <button onclick="checkAnswer()">Submit</button>
+  <div id="result"></div>
+  <script>
+    let currentQuestion = "";
+    let correctAnswer = 0;
+    let score = 0;
+
+    function generateQuestion() {
+      const mode = document.getElementById("mode").value;
+      let decimal;
+      if (mode === "binary") {
+        decimal = Math.floor(Math.random() * 16);
+        currentQuestion = decimal.toString(2).padStart(4, '0');
+        correctAnswer = decimal;
+        document.getElementById("question").innerText = `What is ${currentQuestion} in decimal?`;
+      } else if (mode === "hex") {
+        decimal = Math.floor(Math.random() * 16);
+        currentQuestion = decimal.toString(16).toUpperCase();
+        correctAnswer = decimal;
+        document.getElementById("question").innerText = `What is ${currentQuestion} (Hex) in decimal?`;
+      }
+      document.getElementById("answer").value = "";
+      document.getElementById("result").innerText = "";
+    }
+
+    function checkAnswer() {
+      const userAns = parseInt(document.getElementById("answer").value);
+      if (userAns === correctAnswer) {
+        score++;
+        document.getElementById("result").innerText = `✅ Correct! Score: ${score}`;
+      } else {
+        document.getElementById("result").innerText = `❌ Wrong! Correct answer was ${correctAnswer}. Score: ${score}`;
+      }
+      setTimeout(generateQuestion, 1500);
+    }
+
+    generateQuestion();
+  </script>
+</body>
+</html>
