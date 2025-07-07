@@ -1,96 +1,235 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Binary & Hex Practice Game</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #111;
-      color: #0f0;
-      text-align: center;
-      padding: 50px;
-    }
-    #question {
-      font-size: 2rem;
-      margin-bottom: 20px;
-    }
-    input {
-      font-size: 1.5rem;
-      padding: 10px;
-      width: 120px;
-      text-align: center;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 1rem;
-      margin-top: 10px;
-      cursor: pointer;
-      background-color: #0f0;
-      color: #000;
-      border: none;
-      border-radius: 5px;
-    }
-    #result {
-      margin-top: 20px;
-      font-size: 1.2rem;
-    }
-    select {
-      font-size: 1rem;
-      margin-bottom: 20px;
-      padding: 5px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<title>Number System Quiz Game - Unlimited Questions</title>
+<style>
+  body {
+    background-color: #121212;
+    color: #00ffcc;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    padding: 40px;
+  }
+  h1 {
+    font-size: 2.5rem;
+  }
+  .question {
+    font-size: 1.8rem;
+    margin: 30px 0 10px;
+    min-height: 60px;
+  }
+  .options button {
+    font-size: 1.2rem;
+    margin: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #222;
+    color: #00ffcc;
+    border: 2px solid #00ffcc;
+    border-radius: 8px;
+    transition: 0.3s;
+  }
+  .options button:hover {
+    background-color: #00ffcc;
+    color: #000;
+  }
+  #score, #timer, #level {
+    font-size: 1.2rem;
+    margin: 10px;
+  }
+  #result {
+    font-size: 1.3rem;
+    margin-top: 20px;
+    min-height: 40px;
+  }
+  footer {
+    margin-top: 40px;
+    font-size: 1rem;
+    color: #888;
+  }
+  .social-icons img {
+    width: 30px;
+    height: 30px;
+    margin: 5px;
+    vertical-align: middle;
+  }
+</style>
 </head>
 <body>
-  <h1>🎮 Binary & Hex Practice Game</h1>
-  <div>
-    <label for="mode">Select Mode:</label>
-    <select id="mode" onchange="generateQuestion()">
-      <option value="binary">Binary to Decimal</option>
-      <option value="hex">Hex to Decimal</option>
-    </select>
+<h1>🔢 Number System Quiz Game</h1>
+<div id="level">Level: 1 (Low)</div>
+<div id="timer">Time Left: 10s</div>
+<div id="score">Score: 0</div>
+<div class="question" id="question">Loading...</div>
+<div class="options" id="options"></div>
+<div id="result"></div>
+
+<footer>
+  <p>Made by Rocky Hasan</p>
+  <div class="social-icons">
+    <a href="#" title="Facebook"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" /></a>
+    <a href="#" title="WhatsApp"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp" /></a>
+    <a href="#" title="Instagram"><img src="https://cdn-icons-png.flaticon.com/512/733/733558.png" alt="Instagram" /></a>
+    <a href="#" title="YouTube"><img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube" /></a>
   </div>
-  <div id="question">Loading...</div>
-  <input type="text" id="answer" placeholder="Your Answer">
-  <br>
-  <button onclick="checkAnswer()">Submit</button>
-  <div id="result"></div>
-  <script>
-    let currentQuestion = "";
-    let correctAnswer = 0;
-    let score = 0;
+</footer>
 
-    function generateQuestion() {
-      const mode = document.getElementById("mode").value;
-      let decimal;
-      if (mode === "binary") {
-        decimal = Math.floor(Math.random() * 16);
-        currentQuestion = decimal.toString(2).padStart(4, '0');
-        correctAnswer = decimal;
-        document.getElementById("question").innerText = `What is ${currentQuestion} in decimal?`;
-      } else if (mode === "hex") {
-        decimal = Math.floor(Math.random() * 16);
-        currentQuestion = decimal.toString(16).toUpperCase();
-        correctAnswer = decimal;
-        document.getElementById("question").innerText = `What is ${currentQuestion} (Hex) in decimal?`;
-      }
-      document.getElementById("answer").value = "";
-      document.getElementById("result").innerText = "";
+<script>
+  // ======= Question Generator ===========
+  function generateQuestions() {
+    const questions = [];
+    // 4 bit 2's complement fixed questions
+    const twoCompQuestions = [
+      { q: "2's Complement of 0001 = ?", options: ["1111", "1110", "1101", "1100"], ans: "1111", explanation: "1's complement = 1110, then +1 = 1111" },
+      { q: "2's Complement of 0010 = ?", options: ["1110", "1101", "1111", "1100"], ans: "1110", explanation: "1's complement = 1101, then +1 = 1110" },
+      { q: "2's Complement of 0100 = ?", options: ["1100", "1011", "1110", "1111"], ans: "1100", explanation: "1's complement = 1011, then +1 = 1100" },
+      { q: "2's Complement of 0111 = ?", options: ["1001", "1000", "1111", "1110"], ans: "1001", explanation: "1's complement = 1000, then +1 = 1001" }
+    ];
+    twoCompQuestions.forEach(q => questions.push(q));
+
+    for(let i=1; i<=256; i++) {
+      const bin = i.toString(2);
+      const hex = i.toString(16).toUpperCase();
+      const oct = i.toString(8);
+
+      // Binary to Decimal
+      questions.push({
+        q: `Binary ${bin} = ? (Decimal)`,
+        options: shuffleOptions([i, i+1, i-1 > 0 ? i-1 : i+2, i+2]),
+        ans: i,
+        explanation: `${bin} binary = ${i} decimal`
+      });
+
+      // Decimal to Binary
+      questions.push({
+        q: `Decimal ${i} = ? (Binary)`,
+        options: shuffleOptions([bin, (i+1).toString(2), (i-1 > 0 ? (i-1).toString(2) : (i+2).toString(2)), (i+2).toString(2)]),
+        ans: bin,
+        explanation: `${i} decimal = ${bin} binary`
+      });
+
+      // Decimal to Hex
+      questions.push({
+        q: `Decimal ${i} = ? (Hexadecimal)`,
+        options: shuffleOptions([hex, (i+1).toString(16).toUpperCase(), (i-1 > 0 ? (i-1).toString(16).toUpperCase() : (i+2).toString(16).toUpperCase()), (i+2).toString(16).toUpperCase()]),
+        ans: hex,
+        explanation: `${i} decimal = ${hex} hex`
+      });
+
+      // Hex to Decimal
+      questions.push({
+        q: `Hexadecimal ${hex} = ? (Decimal)`,
+        options: shuffleOptions([i, i+1, i-1 > 0 ? i-1 : i+2, i+2]),
+        ans: i,
+        explanation: `${hex} hex = ${i} decimal`
+      });
+
+      // Octal to Decimal
+      questions.push({
+        q: `Octal ${oct} = ? (Decimal)`,
+        options: shuffleOptions([i, i+1, i-1 > 0 ? i-1 : i+2, i+2]),
+        ans: i,
+        explanation: `${oct} octal = ${i} decimal`
+      });
+
+      // Decimal to Octal
+      questions.push({
+        q: `Decimal ${i} = ? (Octal)`,
+        options: shuffleOptions([oct, (i+1).toString(8), (i-1 > 0 ? (i-1).toString(8) : (i+2).toString(8)), (i+2).toString(8)]),
+        ans: oct,
+        explanation: `${i} decimal = ${oct} octal`
+      });
     }
+    return questions;
+  }
 
-    function checkAnswer() {
-      const userAns = parseInt(document.getElementById("answer").value);
-      if (userAns === correctAnswer) {
-        score++;
-        document.getElementById("result").innerText = `✅ Correct! Score: ${score}`;
-      } else {
-        document.getElementById("result").innerText = `❌ Wrong! Correct answer was ${correctAnswer}. Score: ${score}`;
-      }
-      setTimeout(generateQuestion, 1500);
+  function shuffleOptions(options) {
+    for (let i = options.length -1; i>0; i--) {
+      const j = Math.floor(Math.random() * (i+1));
+      [options[i], options[j]] = [options[j], options[i]];
     }
+    return options;
+  }
 
-    generateQuestion();
-  </script>
+  // ======= Quiz Game Logic ===========
+  let score = 0;
+  let level = 1;
+  let timeLeft = 10;
+  let timerInterval;
+  const questionBank = generateQuestions();
+  let availableQuestions = [...questionBank];
+
+  function getLevelLabel(level) {
+    if (level <= 5) return "Low";
+    if (level <= 10) return "Medium";
+    return "Hard";
+  }
+
+  function adjustTimeByLevel(level) {
+    if (level <= 5) return 35;
+    if (level <= 10) return 60;
+    return 60;
+  }
+
+  function loadQuestion() {
+    clearInterval(timerInterval);
+    if (availableQuestions.length === 0) {
+      availableQuestions = [...questionBank];
+    }
+    const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+    const question = availableQuestions.splice(randomIndex, 1)[0];
+
+    timeLeft = adjustTimeByLevel(level);
+
+    document.getElementById("timer").innerText = `Time Left: ${timeLeft}s`;
+    document.getElementById("level").innerText = `Level: ${level} (${getLevelLabel(level)})`;
+    document.getElementById("question").innerText = question.q;
+    document.getElementById("options").innerHTML = "";
+    document.getElementById("result").innerText = "";
+
+    question.options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.innerText = opt;
+      btn.onclick = () => checkAnswer(opt, question);
+      document.getElementById("options").appendChild(btn);
+    });
+
+    startTimer(() => {
+      document.getElementById("result").innerText = `⏰ Time's Up! Correct: ${question.ans}`;
+      level++;
+      setTimeout(loadQuestion, 1500);
+    });
+  }
+
+  function checkAnswer(ans, question) {
+    clearInterval(timerInterval);
+    if (ans == question.ans) {
+      score += 5;
+      document.getElementById("result").innerText = `✅ Correct! Explanation: ${question.explanation}`;
+    } else {
+      document.getElementById("result").innerText = `❌ Wrong! Correct: ${question.ans}. Explanation: ${question.explanation}`;
+    }
+    level++;
+    document.getElementById("score").innerText = `Score: ${score}`;
+    setTimeout(loadQuestion, 1500);
+  }
+
+  function startTimer(onTimeUp) {
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      document.getElementById("timer").innerText = `Time Left: ${timeLeft}s`;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        onTimeUp();
+      }
+    }, 1000);
+  }
+
+  window.onload = () => {
+    loadQuestion();
+  };
+</script>
 </body>
 </html>
